@@ -5,8 +5,8 @@ List of things that are needed to be implemented
 
 - [ ] Create IP describer
 - [ ] Create Utility functions
-	- [ ]  Create binary to decimal 
-	- [ ]  Create decimal to binary
+	- [X]  Create binary to decimal 
+	- [X]  Create decimal to binary
 	
 - [ ] Define low level functions
 	- [ ] Bitwise AND
