@@ -13,3 +13,4 @@ List of things that are needed to be implemented
 	- [ ] Bitwise OR
 	- [ ] Bitwise NOT
 	- [ ] Apply mask
+- [ ] Define Class IP
