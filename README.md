@@ -3,14 +3,14 @@ Library that contains various TCP/IP functions
 
 List of things that are needed to be implemented
 
-- [ ] Create IP describer
-- [ ] Create Utility functions
+- [X] Create IP describer
+- [X] Create Utility functions
 	- [X]  Create binary to decimal 
 	- [X]  Create decimal to binary
 	
-- [ ] Define low level functions
-	- [ ] Bitwise AND
-	- [ ] Bitwise OR
-	- [ ] Bitwise NOT
-	- [ ] Apply mask
-- [ ] Define Class IP
+- [X] Define low level functions
+	- [X] Bitwise AND
+	- [X] Bitwise OR
+	- [X] Bitwise NOT
+	- [X] Apply mask
+- [X] Define Class IP
