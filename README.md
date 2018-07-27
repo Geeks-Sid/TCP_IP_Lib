@@ -8,3 +8,8 @@ List of things that are needed to be implemented
 	- [ ]  Create binary to decimal 
 	- [ ]  Create decimal to binary
 	
+- [ ] Define low level functions
+	- [ ] Bitwise AND
+	- [ ] Bitwise OR
+	- [ ] Bitwise NOT
+	- [ ] Apply mask
