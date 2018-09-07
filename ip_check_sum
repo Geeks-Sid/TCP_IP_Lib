@@ -1,0 +1,288 @@
+#import numpy as np
+##ip = '45000078 00650000 08110000 ac100a63 ac100a0c'
+#ip = '450000780065000008110000c910200dd7041014'
+#
+#x = list(ip)
+
+class datagram:
+    def __init__(self, ver, hlen, serv_type, tot_len, iden, flags, foff, ttl, protocol, hcsum, SIP, DIP, csum = True):
+        self.version = ver
+        self.header_length = hlen
+        self.service_type = serv_type
+        self.total_length = tot_len
+        self.identification = iden
+        self.flags = flags
+        self.fragmentation_offset = foff
+        self.time_to_live = ttl
+        self.protocol = protocol
+        self.source_ip = SIP
+        self.destination_ip = DIP
+        self.create_check_sum = sum
+        self.check_sum = hcsum
+        
+    def get_version(self):
+        return 'IPv' + self.version
+        
+    def get_header_length(self):
+        return str(int(self.header_length) * int(self.version))
+    
+    def get_service_type(self):
+        if self.service_type[0] == '1':
+            return 'minimize delay'
+        elif self.service_type[1] == '1':
+            return 'maximize throughput'
+        elif self.service_type[2] == '1':
+            return 'maximize reliability'
+        elif self.service_type[3] == '1':
+            return 'minimize monetary cost'
+        else:
+            return 'normal_delivery'
+    
+    def get_total_length(self):
+        return self.total_length
+    
+    def get_identification(self):
+        return self.identification
+    
+    def get_flags(self):
+        return self.flags
+
+    def get_fragmentation_offset(self):
+        return self.fragmentation_offset
+    
+    def get_ttl(self):
+        return self.time_to_live
+
+    def get_protocol(self):
+        if self.protocol == '17':
+            return 'UDP'
+        elif self.protocol == '6':
+            return 'TCP'
+        elif self.protocol == '1':
+            return 'ICMP'
+        elif self.protocol == '2':
+            return 'IGMP'
+        else:
+            return self.protocol
+
+    def get_source_ip(self):
+        return self.source_ip
+    
+    def get_destination_ip(self):
+        return self.destination_ip
+
+    def calculate_check_sum(self):
+        self.temp  = ["" for x in range(13)]
+        self.temp[0] = hex(int(self.version))[2:]
+        self.temp[1] = hex(int(self.header_length))[2:]
+        self.temp[2] = hex(int(self.service_type, 2))[2:]
+        self.temp[3] = hex(int(self.total_length))[2:]
+        self.temp[4] = hex(int(self.identification))[2:]
+        self.temp[5] = hex(int(self.fragmentation_offset))[2:]
+        self.temp[6] = hex(int(self.time_to_live))[2:]
+        self.temp[7] = hex(int(self.protocol))[2:]
+        if self.create_check_sum :
+            self.temp[8] = '0'
+        else:
+            self.temp[8] = self.check_sum
+        self.temp[9], self.temp[10] = self.__operate_ip(source = True, dest = False)
+        self.temp[11], self.temp[12] = self.__operate_ip(source = False, dest = True)
+        self.last_string = [self.temp[0] + self.temp[1] + self.temp[2].zfill(2),
+                            self.temp[3].zfill(4),
+                            self.temp[4].zfill(4),
+                            self.temp[5].zfill(4),
+                            self.temp[6].zfill(2) + self.temp[7].zfill(2),
+                            self.temp[8].zfill(4),
+                            self.temp[9],
+                            self.temp[10],
+                            self.temp[11],
+                            self.temp[12]]
+        print(self.last_string)
+        CSUM = int('0000', 16)
+        t = 0
+        for i in range(10):
+            t = int(self.last_string[i], 16)
+            if (CSUM + t) // 65536 > 0:
+                val = (CSUM + t) // 65536
+                CSUM = CSUM + t
+                CSUM = CSUM % 65536
+                CSUM += val
+            else:
+                CSUM += t
+            print(CSUM)
+        CSUM = 65536 - CSUM
+        CSUM += 1
+        return hex(CSUM)[2:]         
+    
+    def __operate_ip(self, source = True, dest = False):
+        if source == True:
+            n = self.source_ip.split(".")
+            n1 = hex(int(n[0]))[2:].zfill(2) + hex(int(n[1]))[2:].zfill(2)
+            n2 = hex(int(n[2]))[2:].zfill(2) + hex(int(n[3]))[2:].zfill(2)
+            return n1, n2
+        else:
+            n = self.destination_ip.split(".")
+            n1 = hex(int(n[0]))[2:].zfill(2) + hex(int(n[1]))[2:].zfill(2)
+            n2 = hex(int(n[2]))[2:].zfill(2) + hex(int(n[3]))[2:].zfill(2)
+            return n1, n2
+                
+         
+c = datagram('4', '5', '0000', '108', '37580', '000', '0', '56', '6', '0', '146.149.186.20', '169.124.21.149')         
+t = c.calculate_check_sum()
+#def ip_printer(my_temp_ip):
+#    ip_to_print = []
+#    for i in range(0, 8, 2):
+#        temp = my_temp_ip[i] + my_temp_ip[i+1]
+#        ip_to_print.append(int(temp, 16))
+#    print(*ip_to_print, sep = '.')   
+#    return ip_to_print
+
+
+
+#
+#def get_version(x):
+#    return int(x[0], 16)
+
+#def get_header_length(x):
+#    return int(x[1], 16)
+
+#def get_service_type(x):
+#    temp = x[2] + x[3]
+#    print(temp)
+#    return int(temp, 16)
+
+#def get_total_length(x):
+#    temp = ''.join(x[4:8])
+#    return int(temp, 16)
+#
+#def get_identification(x):
+#    temp = ''.join(x[8:12])
+#    return int(temp, 16)
+
+#def get_flags(x):
+#    temp = ''.join(x[12:16])
+#    temp = int(temp, 16)
+#    temp = np.binary_repr(temp, 16)
+#    return temp[:3]
+
+#def get_frag_bits(x):
+#    temp = ''.join(x[12:16])
+#    temp = int(temp, 16)
+#    temp = np.binary_repr(temp, 16)
+#    return temp[3:16]
+
+#def get_ttl(x):
+#    temp = x[16] + x[17]
+#    return int(temp, 16)
+#
+#def get_protocol(x):
+#    temp = x[18] + x[19]
+#    temp = int(temp, 16)
+#    if temp == 17:
+#        return 'UDP'
+#    elif temp == 6:
+#        return 'TCP'
+#    else:
+#        return temp
+#    
+#def get_checksum(x):
+#    temp = ''.join(x[20:24])
+#    return temp
+#
+#def get_source_ip(x):
+#    SIP = x[24:32]
+#    SIP = ''.join(SIP)
+#    SIP = ip_printer(SIP)
+#    return SIP
+#    
+#def get_destination_ip(x):
+#    DIP = x[32:40]
+#    DIP = ''.join(DIP)
+#    DIP = ip_printer(DIP)
+#    return DIP
+        
+#def calculate_check_sum(x):
+#    CSUM = int('0000', 16)
+#    for i in range(0, 40, 4):
+#        t = x[i] + x[i+1] + x[i+2] + x[i+3]
+#        t = int(t, 16)
+#        if (CSUM + t) // 65536 > 0:
+#            val = (CSUM + t) // 65536
+#            CSUM = CSUM + t
+#            CSUM = CSUM % 65536
+#            CSUM += val
+#        else:
+#            CSUM += t
+#    CSUM = 65536 - CSUM
+#    CSUM += 1
+#    return hex(CSUM)[2:]
+#
+#check_sum = calculate_check_sum(x)
+#        
+#def replace_in_packet(x, check_sum):
+#    x[20:24] = check_sum
+#    return ''.join(x)
+#
+#new_ip = replace_in_packet(x, check_sum)
+#
+#def verify_new_packet(x):
+#    CSUM = int('0000', 16)
+#    for i in range(0, 40, 4):
+#        t = x[i] + x[i+1] + x[i+2] + x[i+3]
+#        t = int(t, 16)
+#        if (CSUM + t) // 65536 > 0:
+#            val = (CSUM + t) // 65536
+#            CSUM = CSUM + t
+#            CSUM = CSUM % 65536
+#            CSUM += val
+#        else:
+#            CSUM += t
+#    return hex(CSUM)
+#
+#t = verify_new_packet(new_ip)
+
+#SIP = x[-16:-8]
+#SIP = ''.join(SIP)
+#
+#DIP = x[-8:]
+#DIP = ''.join(DIP)
+#
+#NEW_SIP = [SIP[i] + SIP[i+1] + SIP[i+2] + SIP[i+3] for i in range(0, 8, 4)]
+#NEW_DIP = [DIP[i] + DIP[i+1] + DIP[i+2] + DIP[i+3] for i in range(0, 8, 4)]
+#
+#print("Source IP:", NEW_SIP)
+#print("Destination IP:", NEW_DIP)
+#
+#print("============CHECKING============")
+#CSUM = int('0000', 16)
+#for i in range(2):
+#    t = int(NEW_SIP[i], 16)
+#    CSUM += t
+#for i in range(2):
+#    t = int(NEW_DIP[i], 16)
+#    CSUM += t
+#print('CSUM', hex(CSUM%65536 + CSUM//65536))              
+#t = CSUM%65536 + CSUM//65536
+#CSUM = t
+#new_csum = int('ffff', 16) - CSUM 
+#new_csum += 1   
+#print('HEX CSUM = ', hex(new_csum)) 
+#print(65536 - (CSUM+new_csum))    
+#print('=========CREATING NEW PACKET===========')
+#ip = ip + hex(new_csum)[2:]
+#
+#print('=========CHECKING NEW IP PACKET ==========')
+#x = list(ip)
+#SIP = x[-20:-12]
+#SIP = ''.join(SIP)
+#DIP = x[-12:-4]
+#DIP = ''.join(DIP)
+#CSUM = x[-4:]
+#t = int('0000', 16)
+#for i in range(0, 20, 4):
+#    t += int(''.join(x[i:i+4]), 16)
+#t = (t%65536 + t//65536)
+#if t%65536 == 0:
+#    print("THE NEW IP PACKET WAS NOT DAMAGED")
+#else:
+#print("THE NEW IP PACKET WAS DAMAGED")
